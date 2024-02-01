@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+
+// Definindo a entidade Funcionário
+model Funcionario {
+  id_funcionario     Int       @id @default(autoincrement())
+  nome               String  
+  cargo              String
+  telefone           String? @unique 
+  email              String? @unique
+  
+  
+  // Relacionamentos
+  Producao           Producao[]
+  Estoque_Entrada    Estoque[]  @relation("EstoqueEntrada")
+  Estoque_Saida      Estoque[]  @relation("EstoqueSaida")
+  Ingrediente        Ingrediente[]
+  Checklist          Checklist[]
+}
+
+// Definindo a entidade Produto
+model Produto {
+  id_produto         Int       @id @default(autoincrement())
+  nome               String    
+  tipo               String
+  preco              Int
+  descricao          Int
+
+
+  
+  // Relacionamentos
+  Estoque            Estoque[]
+}
+
+// Definindo a entidade Estoque
+model Estoque {
+  id_estoque         Int       @id @default(autoincrement())
+  quantidade         Int
+  data_entrada       DateTime?
+  data_saida         DateTime?
+  
+  // Relacionamentos
+  id_produto         Int
+  produto            Produto   @relation(fields: [id_produto], references: [id_produto])
+  
+  id_funcionario_entrada Int
+  funcionario_entrada   Funcionario @relation("EstoqueEntrada", fields: [id_funcionario_entrada], references: [id_funcionario])
+
+  id_funcionario_saida Int
+  funcionario_saida   Funcionario @relation("EstoqueSaida", fields: [id_funcionario_saida], references: [id_funcionario])
+}
+
+// Definindo a entidade Producao
+model Producao {
+  id_producao        Int       @id @default(autoincrement())
+  data_producao      DateTime
+  status             String
+  
+  
+  // Relacionamentos
+  id_funcionario_responsavel Int
+  funcionario_responsavel   Funcionario @relation(fields: [id_funcionario_responsavel], references: [id_funcionario])
+}
+
+// Definindo a entidade Ingrediente
+model Ingrediente {
+  id_ingrediente     Int       @id @default(autoincrement())
+  nome               String
+  quantidade_disponivel Int
+  quantidade_minima_encomenda Int
+  
+  
+  // Relacionamentos
+  id_funcionario_responsavel Int
+  funcionario_responsavel   Funcionario @relation(fields: [id_funcionario_responsavel], references: [id_funcionario])
+}
+
+// Definindo a entidade Checklist
+model Checklist {
+  id_checklist       Int       @id @default(autoincrement())
+  data_criacao       DateTime
+  status             String
+  
+  
+  // Relacionamentos
+  id_funcionario_responsavel Int
+  funcionario_responsavel   Funcionario @relation(fields: [id_funcionario_responsavel], references: [id_funcionario])
+}
